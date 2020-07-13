@@ -4,9 +4,9 @@ HOMEDIR_PATH="${HOME}/homedir"
 
 do_it() {
   if [ -d "${HOMEDIR_PATH}" ]; then
-    echo "homedir already exists in '${HOMEDIR_PATH}'. Skip download."
+    echo "ngmy/homedir already exists in '${HOMEDIR_PATH}'. Skip download."
   else
-    echo "Downloading homedir to '${HOMEDIR_PATH}'..."
+    echo "Downloading ngmy/homedir to '${HOMEDIR_PATH}'..."
     git clone https://github.com/ngmy/homedir.git "${HOMEDIR_PATH}"
   fi
   rsync --exclude='.git' \
