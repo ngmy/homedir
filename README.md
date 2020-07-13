@@ -1,4 +1,4 @@
-# homedir
+# ngmy's Home Directory
 
 ## Installation
 
