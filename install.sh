@@ -1,6 +1,6 @@
 #!/bin/bash
 
-HOMEDIR_PATH="${HOME}/homedir"
+HOMEDIR_PATH="${1:-"${HOME}/homedir"}"
 
 do_it() {
   if [ -d "${HOMEDIR_PATH}" ]; then
