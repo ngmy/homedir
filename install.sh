@@ -2,7 +2,7 @@
 
 HOMEDIR_PATH="${HOME}/homedir"
 
-doIt() {
+do_it() {
   if [ -d "${HOMEDIR_PATH}" ]; then
     echo "homedir already exists in '${HOMEDIR_PATH}'. Skip download."
   else
@@ -19,7 +19,7 @@ doIt() {
 
 if [ "$(uname)" == 'Darwin' ]; then
   # Mac
-  doIt
+  do_it
   ln -fns "${HOME}/Documents" "${HOME}/docs"
   ln -fns "${HOME}/Desktop" "${HOME}/var/desktop"
 else
