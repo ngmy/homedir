@@ -1,6 +1,7 @@
 #!/bin/bash
 
 HOMEDIR_PATH="${1:-"${HOME}/homedir"}"
+DOTFILES_PATH="${HOME}/share/dotfiles"
 
 do_it() {
   if [ -d "${HOMEDIR_PATH}" ]; then
@@ -15,6 +16,7 @@ do_it() {
     --exclude='README.md' \
     --exclude='install.sh' \
     -ahv "${HOMEDIR_PATH}/" "${HOME}"
+  curl -LSs https://raw.githubusercontent.com/ngmy/dotfiles/master/install.sh | bash -s -- "${DOTFILES_PATH}"
 }
 
 do_it_for_mac() {
