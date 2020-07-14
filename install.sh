@@ -24,7 +24,7 @@ do_it() {
     -not -name 'LICENSE' \
     -not -name 'README.md' \
     -not -name 'install.sh' \
-    | xargs basename \
+    | xargs -I {} basename {} \
     | xargs -I {} git -C "${HOMEDIR_PATH}" ls-tree --name-only HEAD {} \
     | rsync -ahv \
       --exclude='.gitkeep' \
