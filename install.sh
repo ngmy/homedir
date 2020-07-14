@@ -28,7 +28,7 @@ do_it() {
     | rsync -ahv \
       --exclude='.gitkeep' \
       --files-from=- "${HOMEDIR_PATH}/" "${HOME}"
-  curl -LSs https://raw.githubusercontent.com/ngmy/dotfiles/master/install.sh | bash -s -- "${DOTFILES_PATH}"
+  bash <(curl -LSs https://raw.githubusercontent.com/ngmy/dotfiles/master/install.sh) "${DOTFILES_PATH}"
 }
 
 do_it_for_mac() {
