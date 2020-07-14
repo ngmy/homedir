@@ -20,8 +20,8 @@ do_it() {
 }
 
 do_it_for_mac() {
-  ln -fns "${HOME}/Documents" "${HOME}/docs"
-  ln -fns "${HOME}/Desktop" "${HOME}/var/desktop"
+  ln -fnsv "${HOME}/Documents" "${HOME}/docs"
+  ln -fnsv "${HOME}/Desktop" "${HOME}/var/desktop"
 }
 
 do_it_for_wsl2() {
@@ -31,8 +31,8 @@ do_it_for_wsl2() {
   WIN_USERPROFILE_DIR="${WIN_USERPROFILE#*:}"
   USERPROFILE="${USERPROFILE_MOUNT}${WIN_USERPROFILE_DIR//\\//}"
 
-  ln -fns "${USERPROFILE}/OneDrive/ドキュメント" "${HOME}/docs"
-  ln -fns "${USERPROFILE}/OneDrive/デスクトップ" "${HOME}/var/desktop"
+  ln -fnsv "${USERPROFILE}/OneDrive/ドキュメント" "${HOME}/docs"
+  ln -fnsv "${USERPROFILE}/OneDrive/デスクトップ" "${HOME}/var/desktop"
 }
 
 if [ "$(uname)" == 'Darwin' ]; then
