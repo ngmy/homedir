@@ -10,12 +10,17 @@ do_it() {
     echo "Downloading ngmy/homedir to '${HOMEDIR_PATH}'..."
     git clone https://github.com/ngmy/homedir.git "${HOMEDIR_PATH}"
   fi
-  rsync --exclude='.git' \
-    --exclude='.gitkeep' \
-    --exclude='LICENSE' \
-    --exclude='README.md' \
-    --exclude='install.sh' \
-    -ahv "${HOMEDIR_PATH}/" "${HOME}"
+  find "${HOMEDIR_PATH}" -name '*' \
+    -not -name '.git' \
+    -not -name 'LICENSE' \
+    -not -name 'README.md' \
+    -not -name 'install.sh' \
+    -mindepth 1 -maxdepth 1 \
+    | xargs basename \
+    | xargs -I {} git -C "${HOMEDIR_PATH}" ls-tree --name-only HEAD {} \
+    | rsync -ahv \
+      --exclude='.gitkeep' \
+      --files-from=- "${HOMEDIR_PATH}/" "${HOME}"
   curl -LSs https://raw.githubusercontent.com/ngmy/dotfiles/master/install.sh | bash -s -- "${DOTFILES_PATH}"
 }
 
