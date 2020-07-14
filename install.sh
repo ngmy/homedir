@@ -1,6 +1,6 @@
 #!/bin/bash
 
-HOMEDIR_PATH="$(realpath ${1:-"${HOME}/homedir"})"
+HOMEDIR_PATH="$(realpath "${1:-"${HOME}/homedir"}")"
 DOTFILES_PATH="$(realpath "${HOME}/share/dotfiles")"
 
 do_it() {
