@@ -1,7 +1,7 @@
 #!/bin/bash
 
-HOMEDIR_PATH="${1:-"${HOME}/homedir"}"
-DOTFILES_PATH="${HOME}/share/dotfiles"
+HOMEDIR_PATH="$(realpath ${1:-"${HOME}/homedir"})"
+DOTFILES_PATH="$(realpath "${HOME}/share/dotfiles")"
 
 do_it() {
   if [ -d "${HOMEDIR_PATH}" ]; then
