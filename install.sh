@@ -17,12 +17,13 @@ do_it() {
     echo "Downloading ngmy/homedir to '${HOMEDIR_PATH}'..."
     git clone https://github.com/ngmy/homedir.git "${HOMEDIR_PATH}"
   fi
-  find "${HOMEDIR_PATH}" -name '*' \
+  find "${HOMEDIR_PATH}" \
+    -mindepth 1 -maxdepth 1 \
+    -name '*' \
     -not -name '.git' \
     -not -name 'LICENSE' \
     -not -name 'README.md' \
     -not -name 'install.sh' \
-    -mindepth 1 -maxdepth 1 \
     | xargs basename \
     | xargs -I {} git -C "${HOMEDIR_PATH}" ls-tree --name-only HEAD {} \
     | rsync -ahv \
