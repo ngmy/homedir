@@ -5,7 +5,14 @@ DOTFILES_PATH="$(realpath "${HOME}/share/dotfiles")"
 
 do_it() {
   if [ -d "${HOMEDIR_PATH}" ]; then
-    echo "ngmy/homedir already exists in '${HOMEDIR_PATH}'. Skip download."
+    echo "ngmy/homedir already exists in '${HOMEDIR_PATH}'."
+    read -p 'Do you want to re-download ngmy/homedir and continue the installation? (y/N)' YN
+    if [ "${YN}" != 'y' ]; then
+      echo 'The installation was canceled.'
+      exit 1
+    fi
+    echo "Downloading ngmy/homedir to '${HOMEDIR_PATH}'..."
+    git -C "${HOMEDIR_PATH}" pull origin master
   else
     echo "Downloading ngmy/homedir to '${HOMEDIR_PATH}'..."
     git clone https://github.com/ngmy/homedir.git "${HOMEDIR_PATH}"
