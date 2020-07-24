@@ -2,6 +2,7 @@
 
 HOMEDIR_PATH="$(realpath "${1:-"${HOME}/homedir"}")"
 DOTFILES_PATH="$(realpath "${HOME}/share/dotfiles")"
+WT_SETTINGS_PATH="$(realpath "${HOME}/tmp/wt-settings")"
 
 do_it() {
   if [ -d "${HOMEDIR_PATH}" ]; then
@@ -48,6 +49,11 @@ do_it_for_wsl2() {
   ln -fnsv "${USERPROFILE}/OneDrive/ドキュメント" "${HOME}/docs"
   ln -fnsv "${USERPROFILE}/OneDrive/デスクトップ" "${HOME}/var/desktop"
   ln -fnsv "${USERPROFILE}/Downloads" "${HOME}/var/downloads"
+
+  if [ -z "${WT_SESSION}" ]; then
+    # Windows Terminal
+    bash <(curl -LSs https://raw.githubusercontent.com/ngmy/wt-settings/master/install.sh) "${WT_SETTINGS_PATH}"
+  fi
 }
 
 if [ "$(uname)" == 'Darwin' ]; then
