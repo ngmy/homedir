@@ -35,6 +35,7 @@ do_it() {
 do_it_for_mac() {
   ln -fnsv "${HOME}/Documents" "${HOME}/docs"
   ln -fnsv "${HOME}/Desktop" "${HOME}/var/desktop"
+  ln -fnsv "${HOME}/Downloads" "${HOME}/var/downloads"
 }
 
 do_it_for_wsl2() {
@@ -46,6 +47,7 @@ do_it_for_wsl2() {
 
   ln -fnsv "${USERPROFILE}/OneDrive/ドキュメント" "${HOME}/docs"
   ln -fnsv "${USERPROFILE}/OneDrive/デスクトップ" "${HOME}/var/desktop"
+  ln -fnsv "${USERPROFILE}/Downloads" "${HOME}/var/downloads"
 }
 
 if [ "$(uname)" == 'Darwin' ]; then
