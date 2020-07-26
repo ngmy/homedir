@@ -55,15 +55,15 @@ install_for_mac() {
 }
 
 install_for_wsl2() {
-  local WIN_USERPROFILE="$(cmd.exe /c "<nul set /p=%UserProfile%" 2>/dev/null)"
-  local WIN_USERPROFILE_DRIVE="${WIN_USERPROFILE%%:*}:\\"
-  local USERPROFILE_MOUNT="$(findmnt --noheadings --first-only --output TARGET "${WIN_USERPROFILE_DRIVE}")"
-  local WIN_USERPROFILE_DIR="${WIN_USERPROFILE#*:}"
-  local USERPROFILE="${USERPROFILE_MOUNT}${WIN_USERPROFILE_DIR//\\//}"
+  local WIN_USER_PROFILE_PATH="$(cmd.exe /c "<nul set /p=%UserProfile%" 2>/dev/null)"
+  local WIN_USER_PROFILE_DRIVE="${WIN_USER_PROFILE_PATH%%:*}:"
+  local USER_PROFILE_MOUNT_PATH="$(findmnt --noheadings --first-only --output TARGET "${WIN_USER_PROFILE_DRIVE}\\")"
+  local WIN_USER_PROFILE_PATH_WITHOUT_DRIVE="${WIN_USER_PROFILE_PATH#*:}"
+  local USER_PROFILE_PATH="${USER_PROFILE_MOUNT_PATH}${WIN_USER_PROFILE_PATH_WITHOUT_DRIVE//\\//}"
 
-  ln -fnsv "${USERPROFILE}/OneDrive/ドキュメント" "${HOME}/docs"
-  ln -fnsv "${USERPROFILE}/OneDrive/デスクトップ" "${HOME}/var/desktop"
-  ln -fnsv "${USERPROFILE}/Downloads" "${HOME}/var/downloads"
+  ln -fnsv "${USER_PROFILE_PATH}/OneDrive/ドキュメント" "${HOME}/docs"
+  ln -fnsv "${USER_PROFILE_PATH}/OneDrive/デスクトップ" "${HOME}/var/desktop"
+  ln -fnsv "${USER_PROFILE_PATH}/Downloads" "${HOME}/var/downloads"
 }
 
 install_dotfiles() {
