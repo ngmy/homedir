@@ -1,12 +1,27 @@
 #!/bin/bash
 
-HOMEDIR_PATH="$(realpath "${1:-"${HOME}/homedir"}")"
-DOTFILES_PATH="$(realpath "${HOME}/share/dotfiles")"
-WT_SETTINGS_PATH="$(realpath "${HOME}/tmp/wt-settings")"
+is_mac() {
+  [ "$(uname)" == 'Darwin' ]
+}
 
-do_it() {
+is_linux() {
+  [ "$(expr substr $(uname -s) 1 5)" == 'Linux' ]
+}
+
+is_wsl2() {
+  [ is_linux -a -d '/mnt/c' ]
+}
+
+is_wt() {
+  [ -n "${WT_SESSION}" ]
+}
+
+install_for_all() {
+  local HOMEDIR_PATH="$(realpath "${1:-"${HOME}/homedir"}")"
+
   if [ -d "${HOMEDIR_PATH}" ]; then
     echo "ngmy/homedir already exists in '${HOMEDIR_PATH}'."
+    local YN
     read -p 'Do you want to re-download ngmy/homedir and continue the installation? (y/N)' YN
     if [ "${YN}" != 'y' ]; then
       echo 'The installation was canceled.'
@@ -18,6 +33,7 @@ do_it() {
     echo "Downloading ngmy/homedir to '${HOMEDIR_PATH}'..."
     git clone https://github.com/ngmy/homedir.git "${HOMEDIR_PATH}"
   fi
+
   find "${HOMEDIR_PATH}" \
     -mindepth 1 -maxdepth 1 \
     -name '*' \
@@ -30,40 +46,63 @@ do_it() {
     | rsync -ahv \
       --exclude='.gitkeep' \
       --files-from=- "${HOMEDIR_PATH}/" "${HOME}"
-  bash <(curl -LSs https://raw.githubusercontent.com/ngmy/dotfiles/master/install.sh) "${DOTFILES_PATH}"
 }
 
-do_it_for_mac() {
+install_for_mac() {
   ln -fnsv "${HOME}/Documents" "${HOME}/docs"
   ln -fnsv "${HOME}/Desktop" "${HOME}/var/desktop"
   ln -fnsv "${HOME}/Downloads" "${HOME}/var/downloads"
 }
 
-do_it_for_wsl2() {
-  WIN_USERPROFILE="$(cmd.exe /c "<nul set /p=%UserProfile%" 2>/dev/null)"
-  WIN_USERPROFILE_DRIVE="${WIN_USERPROFILE%%:*}:\\"
-  USERPROFILE_MOUNT="$(findmnt --noheadings --first-only --output TARGET "${WIN_USERPROFILE_DRIVE}")"
-  WIN_USERPROFILE_DIR="${WIN_USERPROFILE#*:}"
-  USERPROFILE="${USERPROFILE_MOUNT}${WIN_USERPROFILE_DIR//\\//}"
+install_for_wsl2() {
+  local WIN_USERPROFILE="$(cmd.exe /c "<nul set /p=%UserProfile%" 2>/dev/null)"
+  local WIN_USERPROFILE_DRIVE="${WIN_USERPROFILE%%:*}:\\"
+  local USERPROFILE_MOUNT="$(findmnt --noheadings --first-only --output TARGET "${WIN_USERPROFILE_DRIVE}")"
+  local WIN_USERPROFILE_DIR="${WIN_USERPROFILE#*:}"
+  local USERPROFILE="${USERPROFILE_MOUNT}${WIN_USERPROFILE_DIR//\\//}"
 
   ln -fnsv "${USERPROFILE}/OneDrive/ドキュメント" "${HOME}/docs"
   ln -fnsv "${USERPROFILE}/OneDrive/デスクトップ" "${HOME}/var/desktop"
   ln -fnsv "${USERPROFILE}/Downloads" "${HOME}/var/downloads"
+}
 
-  if [ -z "${WT_SESSION}" ]; then
-    # Windows Terminal
+install_dotfiles() {
+  local DOTFILES_PATH="$(realpath "${HOME}/share/dotfiles")"
+  bash <(curl -LSs https://raw.githubusercontent.com/ngmy/dotfiles/master/install.sh) "${DOTFILES_PATH}"
+}
+
+install_wt_settings() {
+  if is_wt; then
+    local WT_SETTINGS_PATH="$(realpath "${HOME}/tmp/wt-settings")"
     bash <(curl -LSs https://raw.githubusercontent.com/ngmy/wt-settings/master/install.sh) "${WT_SETTINGS_PATH}"
   fi
 }
 
-if [ "$(uname)" == 'Darwin' ]; then
-  # Mac
-  do_it
-  do_it_for_mac
-elif [ "$(expr substr $(uname -s) 1 5)" == 'Linux' -a -d '/mnt/c' ]; then
-  # WSL 2
-  do_it
-  do_it_for_wsl2
+execute_tasks() {
+  local TASKS=("$@")
+  local task
+  for task in "${TASKS[@]}"; do
+    eval "${task}"
+  done
+}
+
+MAC_TASKS=(
+  'install_for_all'
+  'install_for_mac'
+  'install_dotfiles'
+)
+
+WSL2_TASKS=(
+  'install_for_all'
+  'install_for_wsl2'
+  'install_dotfiles'
+  'install_wt_settings'
+)
+
+if is_mac; then
+  execute_tasks "${MAC_TASKS[@]}"
+elif is_wsl2; then
+  execute_tasks "${WSL2_TASKS[@]}"
 else
   echo "Your platform ($(uname -a)) is not supported."
   exit 1
