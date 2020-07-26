@@ -1,4 +1,5 @@
 #!/bin/bash
+set -Ceuo pipefail
 
 is_mac() {
   [ "$(uname)" == 'Darwin' ]
