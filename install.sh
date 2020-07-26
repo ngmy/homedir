@@ -16,9 +16,7 @@ is_wt() {
   [ -n "${WT_SESSION}" ]
 }
 
-install_for_all() {
-  local HOMEDIR_PATH="$(realpath "${1:-"${HOME}/homedir"}")"
-
+download() {
   if [ -d "${HOMEDIR_PATH}" ]; then
     echo "ngmy/homedir already exists in '${HOMEDIR_PATH}'."
     local YN
@@ -33,7 +31,9 @@ install_for_all() {
     echo "Downloading ngmy/homedir to '${HOMEDIR_PATH}'..."
     git clone https://github.com/ngmy/homedir.git "${HOMEDIR_PATH}"
   fi
+}
 
+install_for_all() {
   find "${HOMEDIR_PATH}" \
     -mindepth 1 -maxdepth 1 \
     -name '*' \
@@ -86,24 +86,31 @@ execute_tasks() {
   done
 }
 
-MAC_TASKS=(
-  'install_for_all'
-  'install_for_mac'
-  'install_dotfiles'
-)
+main() {
+  local HOMEDIR_PATH="$(realpath "${1:-"${HOME}/homedir"}")"
 
-WSL2_TASKS=(
-  'install_for_all'
-  'install_for_wsl2'
-  'install_dotfiles'
-  'install_wt_settings'
-)
+  local MAC_TASKS=(
+    'download'
+    'install_for_all'
+    'install_for_mac'
+    'install_dotfiles'
+  )
+  local WSL2_TASKS=(
+    'download'
+    'install_for_all'
+    'install_for_wsl2'
+    'install_dotfiles'
+    'install_wt_settings'
+  )
 
-if is_mac; then
-  execute_tasks "${MAC_TASKS[@]}"
-elif is_wsl2; then
-  execute_tasks "${WSL2_TASKS[@]}"
-else
-  echo "Your platform ($(uname -a)) is not supported."
-  exit 1
-fi
+  if is_mac; then
+    execute_tasks "${MAC_TASKS[@]}"
+  elif is_wsl2; then
+    execute_tasks "${WSL2_TASKS[@]}"
+  else
+    echo "Your platform ($(uname -a)) is not supported."
+    exit 1
+  fi
+}
+
+main $1
