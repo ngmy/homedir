@@ -13,10 +13,6 @@ is_wsl2() {
   [ is_linux -a -d '/mnt/c' ]
 }
 
-is_wt() {
-  [ -n "${WT_SESSION}" ]
-}
-
 download() {
   if [ -d "${HOMEDIR_PATH}" ]; then
     echo "ngmy/homedir already exists in '${HOMEDIR_PATH}'."
@@ -67,18 +63,6 @@ install_for_wsl2() {
   ln -fnsv "${USER_PROFILE_PATH}/Downloads" "${HOME}/var/downloads"
 }
 
-install_dotfiles() {
-  local DOTFILES_PATH="$(realpath "${HOME}/share/dotfiles")"
-  bash <(curl -LSs https://raw.githubusercontent.com/ngmy/dotfiles/master/install.sh) "${DOTFILES_PATH}"
-}
-
-install_wt_settings() {
-  if is_wt; then
-    local WT_SETTINGS_PATH="$(realpath "${HOME}/tmp/wt-settings")"
-    bash <(curl -LSs https://raw.githubusercontent.com/ngmy/wt-settings/master/install.sh) "${WT_SETTINGS_PATH}"
-  fi
-}
-
 execute_tasks() {
   local TASKS=("$@")
   local task
@@ -94,14 +78,11 @@ main() {
     'download'
     'install_for_all'
     'install_for_mac'
-    'install_dotfiles'
   )
   local WSL2_TASKS=(
     'download'
     'install_for_all'
     'install_for_wsl2'
-    'install_dotfiles'
-    'install_wt_settings'
   )
 
   if is_mac; then
