@@ -40,7 +40,7 @@ install_for_all() {
     -not -name 'install.sh' \
     | xargs -I {} basename {} \
     | xargs -I {} git -C "${HOMEDIR_PATH}" ls-tree --name-only HEAD {} \
-    | rsync -ahrv \
+    | rsync -hrv \
       --exclude='.gitkeep' \
       --files-from=- "${HOMEDIR_PATH}/" "${HOME}"
 }
