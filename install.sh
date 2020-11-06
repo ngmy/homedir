@@ -1,4 +1,5 @@
 #!/bin/bash
+
 set -Ceuxo pipefail
 
 is_mac() {
@@ -95,4 +96,4 @@ main() {
   fi
 }
 
-main $1
+main "$@"
