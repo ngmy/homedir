@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [[ "$(uname -r)" =~ 'microsoft' ]]; then
+  if [ -f "${1}" ]; then
+    /mnt/c/Program\ Files\ \(x86\)/Google/Chrome/Application/chrome.exe "$(wslpath -w $(realpath $1))"
+  else
+    /mnt/c/Program\ Files\ \(x86\)/Google/Chrome/Application/chrome.exe "$1"
+  fi
+fi
