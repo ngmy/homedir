@@ -15,24 +15,24 @@ is_wsl2() {
 }
 
 download() {
-  if [ -d "${HOMEDIR_PATH}" ]; then
-    echo "ngmy/homedir already exists in '${HOMEDIR_PATH}'."
-    local YN
-    read -p 'Do you want to re-download ngmy/homedir and continue the installation? (y/N)' YN
-    if [ "${YN}" != 'y' ]; then
+  if [ -d "${homedir_path}" ]; then
+    echo "ngmy/homedir already exists in '${homedir_path}'."
+    local yn
+    read -p 'Do you want to re-download ngmy/homedir and continue the installation? (y/N)' yn
+    if [ "${yn}" != 'y' ]; then
       echo 'The installation was canceled.'
       exit 1
     fi
-    echo "Downloading ngmy/homedir to '${HOMEDIR_PATH}'..."
-    git -C "${HOMEDIR_PATH}" pull origin master
+    echo "Downloading ngmy/homedir to '${homedir_path}'..."
+    git -C "${homedir_path}" pull origin master
   else
-    echo "Downloading ngmy/homedir to '${HOMEDIR_PATH}'..."
-    git clone https://github.com/ngmy/homedir.git "${HOMEDIR_PATH}"
+    echo "Downloading ngmy/homedir to '${homedir_path}'..."
+    git clone https://github.com/ngmy/homedir.git "${homedir_path}"
   fi
 }
 
 install_for_all() {
-  find "${HOMEDIR_PATH}" \
+  find "${homedir_path}" \
     -mindepth 1 -maxdepth 1 \
     -name '*' \
     -not -name '.git' \
@@ -40,10 +40,10 @@ install_for_all() {
     -not -name 'README.md' \
     -not -name 'install.sh' \
     | xargs -I {} basename {} \
-    | xargs -I {} git -C "${HOMEDIR_PATH}" ls-tree --name-only HEAD {} \
+    | xargs -I {} git -C "${homedir_path}" ls-tree --name-only HEAD {} \
     | rsync -hrv \
       --exclude='.gitkeep' \
-      --files-from=- "${HOMEDIR_PATH}/" "${HOME}"
+      --files-from=- "${homedir_path}/" "${HOME}"
 }
 
 install_for_mac() {
@@ -53,43 +53,43 @@ install_for_mac() {
 }
 
 install_for_wsl2() {
-  local WIN_USER_PROFILE_PATH="$(cmd.exe /c "<nul set /p=%UserProfile%" 2>/dev/null)"
-  local WIN_USER_PROFILE_DRIVE="${WIN_USER_PROFILE_PATH%%:*}:"
-  local USER_PROFILE_MOUNT_PATH="$(findmnt --noheadings --first-only --output TARGET "${WIN_USER_PROFILE_DRIVE}\\")"
-  local WIN_USER_PROFILE_PATH_WITHOUT_DRIVE="${WIN_USER_PROFILE_PATH#*:}"
-  local USER_PROFILE_PATH="${USER_PROFILE_MOUNT_PATH}${WIN_USER_PROFILE_PATH_WITHOUT_DRIVE//\\//}"
+  local -r win_user_profile_path="$(cmd.exe /c "<nul set /p=%UserProfile%" 2>/dev/null)"
+  local -r win_user_profile_drive="${win_user_profile_path%%:*}:"
+  local -r user_profile_mount_path="$(findmnt --noheadings --first-only --output TARGET "${win_user_profile_drive}\\")"
+  local -r win_user_profile_path_without_drive="${win_user_profile_path#*:}"
+  local -r user_profile_path="${user_profile_mount_path}${win_user_profile_path_without_drive//\\//}"
 
-  ln -fnsv "${USER_PROFILE_PATH}/OneDrive/ドキュメント" "${HOME}/docs"
-  ln -fnsv "${USER_PROFILE_PATH}/OneDrive/デスクトップ" "${HOME}/var/desktop"
-  ln -fnsv "${USER_PROFILE_PATH}/Downloads" "${HOME}/var/downloads"
+  ln -fnsv "${user_profile_path}/OneDrive/ドキュメント" "${HOME}/docs"
+  ln -fnsv "${user_profile_path}/OneDrive/デスクトップ" "${HOME}/var/desktop"
+  ln -fnsv "${user_profile_path}/Downloads" "${HOME}/var/downloads"
 }
 
 execute_tasks() {
-  local TASKS=("$@")
+  local -r tasks=("$@")
   local task
-  for task in "${TASKS[@]}"; do
+  for task in "${tasks[@]}"; do
     eval "${task}"
   done
 }
 
 main() {
-  local HOMEDIR_PATH="$(realpath "${1:-"${HOME}/homedir"}")"
+  local -r homedir_path="$(realpath "${1:-"${HOME}/homedir"}")"
 
-  local MAC_TASKS=(
+  local -r mac_tasks=(
     'download'
     'install_for_all'
     'install_for_mac'
   )
-  local WSL2_TASKS=(
+  local -r wsl2_tasks=(
     'download'
     'install_for_all'
     'install_for_wsl2'
   )
 
   if is_mac; then
-    execute_tasks "${MAC_TASKS[@]}"
+    execute_tasks "${mac_tasks[@]}"
   elif is_wsl2; then
-    execute_tasks "${WSL2_TASKS[@]}"
+    execute_tasks "${wsl2_tasks[@]}"
   else
     echo "Your platform ($(uname -a)) is not supported."
     exit 1
