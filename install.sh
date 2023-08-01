@@ -61,6 +61,7 @@ install_for_wsl2() {
 
   ln -fnsv "${user_profile_path}/OneDrive/ドキュメント" "${HOME}/docs"
   ln -fnsv "${user_profile_path}/OneDrive/デスクトップ" "${HOME}/var/desktop"
+  ln -fnsv "${user_profile_path}/OneDrive/作業" "${HOME}/work"
   ln -fnsv "${user_profile_path}/Downloads" "${HOME}/var/downloads"
 }
 
