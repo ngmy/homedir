@@ -53,11 +53,11 @@ install_for_mac() {
 }
 
 install_for_wsl2() {
-  local -r win_user_profile_path="$(cmd.exe /c "<nul set /p=%UserProfile%" 2>/dev/null)"
+  local -r win_user_profile_path="$(cmd.exe /c '<nul set /p=%UserProfile%' 2>/dev/null)"
   local -r win_user_profile_drive="${win_user_profile_path%%:*}:"
-  local -r user_profile_mount_path="$(findmnt --noheadings --first-only --output TARGET "${win_user_profile_drive}\\")"
+  local -r user_profile_mount_path="$(wslpath "${win_user_profile_drive}\\")"
   local -r win_user_profile_path_without_drive="${win_user_profile_path#*:}"
-  local -r user_profile_path="${user_profile_mount_path}${win_user_profile_path_without_drive//\\//}"
+  local -r user_profile_path="${user_profile_mount_path%/}${win_user_profile_path_without_drive//\\//}"
 
   ln -fnsv "${user_profile_path}/OneDrive/ドキュメント" "${HOME}/docs"
   ln -fnsv "${user_profile_path}/OneDrive/デスクトップ" "${HOME}/var/desktop"
